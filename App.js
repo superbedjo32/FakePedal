@@ -1,7 +1,9 @@
-import React from 'react';
-import {ScrollView, StyleSheet,  Text, View, Image, ImageBackground} from 'react-native';
-import {Element3, Receipt21, Clock, Message} from 'iconsax-react-native';
+import React, {useState} from 'react';
+import {ScrollView, StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
+import {Element3} from 'iconsax-react-native';
+import {BlogList, CategoryList} from './data';
 import { fontType, colors } from './src/theme';
+import { ListHorizontal, ItemSmall } from './src/components';
 
 export default function App() {
   return (
@@ -11,28 +13,7 @@ export default function App() {
         <Element3 color={colors.black()} variant="Linear" size={24} />
       </View>
       <View style={styles.listCategory}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={{...category.item, marginLeft: 24}}>
-            <Text style={{...category.title, color: colors.blue()}}>
-              Popular
-            </Text>
-          </View>
-          <View style={category.item}>
-            <Text style={category.title}>Distortion</Text>
-          </View>
-          <View style={category.item}>
-            <Text style={category.title}>Delay</Text>
-          </View>
-          <View style={category.item}>
-            <Text style={category.title}>Flanger</Text>
-          </View>
-          <View style={category.item}>
-            <Text style={category.title}>Chorus</Text>
-          </View>
-          <View style={{...category.item, marginRight: 24}}>
-            <Text style={category.title}>Overdrive</Text>
-          </View>
-        </ScrollView>
+        <FlatListCategory />
       </View>
       <ListBlog />
     </View>
@@ -66,6 +47,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     gap: 10,
   },
+  listCard: {
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    gap: 15,
+  },
 });
 const category = StyleSheet.create({
   item: {
@@ -74,318 +60,27 @@ const category = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     backgroundColor: colors.grey(0.08),
-    marginHorizontal:5
+    
   },
   title: {
     fontFamily: fontType['Pjs-SemiBold'],
     fontSize: 14,
     lineHeight: 18,
-    color: colors.grey(),
+
   },
-})
+});
 
 const ListBlog = () => {
+  const horizontalData = BlogList.slice(0, 5);
+  const verticalData = BlogList.slice(5);
   return (
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.listBlog}>
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          contentContainerStyle={{gap: 15}}>
-          <View style={{...itemHorizontal.cardItem, width: 400}}>
-            <ImageBackground
-              style={itemHorizontal.cardImage}
-              resizeMode="cover"
-              imageStyle={{borderRadius: 15}}
-              source={require('./src/assets/img/gt3.jpg')}>
-              <View style={itemHorizontal.cardContent}>
-                <View style={itemHorizontal.cardInfo}>
-                  <Text style={itemHorizontal.cardTitle}>
-                    Rediscovering Guitar pedal in FakePedal
-                  </Text>
-                  <Text style={itemHorizontal.cardText}>Nov 10, 2023</Text>
-                </View>
-                <View>
-                  <View style={itemHorizontal.cardIcon}>
-                    <Receipt21 color={colors.white()} variant="Linear" size={20} />
-                  </View>
-                </View>
-              </View>
-            </ImageBackground>
-          </View>
-        </ScrollView>
-        <View style={itemVertical.listCard}>
-          <View style={itemVertical.cardItem}>
-            <Image
-              style={itemVertical.cardImage}
-              source={require('./src/assets/img/ds1w.png')}
-            />
-            <View style={itemVertical.cardContent}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{gap: 5, width: '70%'}}>
-                  <Text style={itemVertical.cardCategory}>Distortion</Text>
-                  <Text style={itemVertical.cardTitle}>
-                    Boss DS-1 WazaCraft
-                  </Text>
-                </View>
-                <Receipt21
-                  color={colors.grey(0.6)}
-                  variant="Linear"
-                  size={20}
-                />
-              </View>
-              <View style={itemVertical.cardInfo}>
-                <Clock
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Jul 25, 2023</Text>
-                <Message
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Rp.600.000</Text>
-              </View>
-            </View>
-          </View>
-          <View style={itemVertical.cardItem}>
-            <Image
-              style={itemVertical.cardImage}
-              source={require('./src/assets/img/mooer_tri.jpg')}
-            />
-            <View style={itemVertical.cardContent}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{gap: 5, width: '70%'}}>
-                  <Text style={itemVertical.cardCategory}>Tremolo</Text>
-                  <Text style={itemVertical.cardTitle}>
-                    Mooer Triangolo
-                  </Text>
-                </View>
-                <Receipt21
-                  color={colors.grey(0.6)}
-                  variant="Linear"
-                  size={20}
-                />
-              </View>
-              <View style={itemVertical.cardInfo}>
-                <Clock
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Jul 25, 2023</Text>
-                <Message
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Rp.650.000</Text>
-              </View>
-            </View>
-          </View>
-          <View style={itemVertical.cardItem}>
-            <Image
-              style={itemVertical.cardImage}
-              source={require('./src/assets/img/Boss_re2.jpg')}
-            />
-            <View style={itemVertical.cardContent}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{gap: 5, width: '70%'}}>
-                  <Text style={itemVertical.cardCategory}>Delay</Text>
-                  <Text style={itemVertical.cardTitle}>
-                    Boss RE-2 Delay
-                  </Text>
-                </View>
-                <Receipt21
-                  color={colors.grey(0.6)}
-                  variant="Linear"
-                  size={20}
-                />
-              </View>
-              <View style={itemVertical.cardInfo}>
-                <Clock
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Jul 28, 2023</Text>
-                <Message
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Rp.1.000.000</Text>
-              </View>
-            </View>
-          </View>
-          <View style={itemVertical.cardItem}>
-            <Image
-              style={itemVertical.cardImage}
-              source={require('./src/assets/img/boss_mt2w.jpg')}
-            />
-            <View style={itemVertical.cardContent}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{gap: 5, width: '70%'}}>
-                  <Text style={itemVertical.cardCategory}>Distortion</Text>
-                  <Text style={itemVertical.cardTitle}>Boss MT-2 WazaCraft</Text>
-                </View>
-                <Receipt21
-                  color={colors.grey(0.6)}
-                  variant="Linear"
-                  size={20}
-                />
-              </View>
-              <View style={itemVertical.cardInfo}>
-                <Clock
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Jul 25, 2023</Text>
-                <Message
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Rp.1.000.000</Text>
-              </View>
-            </View>
-          </View>
-          <View style={itemVertical.cardItem}>
-            <Image
-              style={itemVertical.cardImage}
-              source={require('./src/assets/img/mooer_R7.jpg')}
-            />
-            <View style={itemVertical.cardContent}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{gap: 5, width: '70%'}}>
-                  <Text style={itemVertical.cardCategory}>Reverb</Text>
-                  <Text style={itemVertical.cardTitle}>
-                    Mooer R7
-                  </Text>
-                </View>
-                <Receipt21
-                  color={colors.grey(0.6)}
-                  variant="Linear"
-                  size={20}
-                />
-              </View>
-              <View style={itemVertical.cardInfo}>
-                <Clock
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Jul 25, 2023</Text>
-                <Message
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Rp.800.000</Text>
-              </View>
-            </View>
-          </View>
-          <View style={itemVertical.cardItem}>
-            <Image
-              style={itemVertical.cardImage}
-              source={require('./src/assets/img/Mooer_Radar.jpg')}
-            />
-            <View style={itemVertical.cardContent}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{gap: 5, width: '70%'}}>
-                  <Text style={itemVertical.cardCategory}>CabSim</Text>
-                  <Text style={itemVertical.cardTitle}>
-                    Mooer Radar
-                  </Text>
-                </View>
-                <Receipt21
-                  color={colors.grey(0.6)}
-                  variant="Linear"
-                  size={20}
-                />
-              </View>
-              <View style={itemVertical.cardInfo}>
-                <Clock
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Jul 26, 2023</Text>
-                <Message
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Rp.1.500.000</Text>
-              </View>
-            </View>
-          </View>
-          <View style={itemVertical.cardItem}>
-            <Image
-              style={itemVertical.cardImage}
-              source={require('./src/assets/img/boss_sd1.jpg')}
-            />
-            <View style={itemVertical.cardContent}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{gap: 5, width: '70%'}}>
-                  <Text style={itemVertical.cardCategory}>Overdrive</Text>
-                  <Text style={itemVertical.cardTitle}>
-                    Boss SD-1
-                  </Text>
-                </View>
-                <Receipt21
-                  color={colors.grey(0.6)}
-                  variant="Linear"
-                  size={20}
-                />
-              </View>
-              <View style={itemVertical.cardInfo}>
-                <Clock
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Jul 25, 2023</Text>
-                <Message
-                  size={10}
-                  variant="Linear"
-                  color={colors.grey(0.6)}
-                />
-                <Text style={itemVertical.cardText}>Rp.500.000</Text>
-              </View>
-            </View>
-          </View>
+        <ListHorizontal data={horizontalData} />
+        <View style={styles.listCard}>
+          {verticalData.map((item, index) => (
+            <ItemSmall item={item} key={index} />
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -476,3 +171,38 @@ const itemHorizontal = StyleSheet.create({
     borderRadius: 5,
   },
 });
+
+const ItemCategory = ({item, onPress, color}) => {
+  return (
+    <TouchableOpacity onPress={onPress}>
+      <View style={category.item}>
+        <Text style={{...category.title, color}}>{item.categoryName}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const FlatListCategory = () => {
+  const [selected, setSelected] = useState(1);
+  const renderItem = ({item}) => {
+    const color = item.id === selected ? colors.blue() : colors.grey();
+    return (
+      <ItemCategory
+        item={item}
+        onPress={() => setSelected(item.id)}
+        color={color}
+      />
+    );
+  };
+  return (
+    <FlatList
+      data={CategoryList}
+      keyExtractor={item => item.id}
+      renderItem={item => renderItem({...item})}
+      ItemSeparatorComponent={() => <View style={{width: 10}} />}
+      contentContainerStyle={{paddingHorizontal: 24}}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+    />
+  );
+};

@@ -1,20 +1,62 @@
-import React, {useState} from 'react';
-import {ScrollView, StyleSheet, Text, View, FlatList, TouchableOpacity} from 'react-native';
-import {Element3} from 'iconsax-react-native';
-import {BlogList, CategoryList} from './data';
+import React from 'react';
+import {FlatList, ScrollView, StyleSheet,  Text, View, Image, ImageBackground, TouchableOpacity} from 'react-native';
+import {Notification, Element3, Receipt21, Clock, Message, DollarCircle} from 'iconsax-react-native';
 import { fontType, colors } from './src/theme';
-import { ListHorizontal, ItemSmall } from './src/components';
+import { gt1, gt2, p2 } from './src/assets/img';
 
 export default function App() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>FakePedal.</Text>
-        <Element3 color={colors.black()} variant="Linear" size={24} />
+        <Notification color={colors.black()} variant="Linear" size={24} />
+      </View>
+      <View style={styles.header}>
+      <Text style={styles.title}>Explore</Text>
       </View>
       <View style={styles.listCategory}>
-        <FlatListCategory />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={{...category.item, marginLeft: 24}}>
+            <Text style={{...category.title, color: colors.orange()}}>
+              Tuner
+            </Text>
+          </View>
+          <View style={category.item}>
+            <Text style={category.title}>Distortion</Text>
+          </View>
+          <View style={category.item}>
+            <Text style={category.title}>Delay</Text>
+          </View>
+          <View style={category.item}>
+            <Text style={category.title}>Flanger</Text>
+          </View>
+          <View style={category.item}>
+            <Text style={category.title}>Chorus</Text>
+          </View>
+          <View style={{...category.item, marginRight: 24}}>
+            <Text style={category.title}>Overdrive</Text>
+          </View>
+        </ScrollView>
       </View>
+      <View style={{...itemMenu.cardItem, width: 480}}>
+            <ImageBackground
+              style={itemMenu.cardImage}
+              resizeMode="cover"
+              imageStyle={{borderRadius: 15}}
+              source={gt1}>
+              <View style={itemMenu.cardContent}>
+                <View style={itemMenu.cardInfo}>
+                  <Text style={itemMenu.cardTitle}>
+                    Rediscovering Guitar pedal in FakePedal
+                  </Text>
+                  <Text style={itemMenu.cardText}>since 2023</Text>
+                </View>
+              </View>
+            </ImageBackground>
+          </View>
+          <View style={styles.header}>
+            <Text style={styles.title}>New Arrival</Text>
+          </View>
       <ListBlog />
     </View>
   );
@@ -47,11 +89,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     gap: 10,
   },
-  listCard: {
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    gap: 15,
-  },
 });
 const category = StyleSheet.create({
   item: {
@@ -60,87 +97,49 @@ const category = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     backgroundColor: colors.grey(0.08),
-    
+    marginHorizontal:5
   },
   title: {
     fontFamily: fontType['Pjs-SemiBold'],
     fontSize: 14,
     lineHeight: 18,
-
+    color: colors.grey(),
   },
-});
+})
 
 const ListBlog = () => {
-  const horizontalData = BlogList.slice(0, 5);
-  const verticalData = BlogList.slice(5);
+  
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.listBlog}>
-        <ListHorizontal data={horizontalData} />
-        <View style={styles.listCard}>
-          {verticalData.map((item, index) => (
-            <ItemSmall item={item} key={index} />
-          ))}
-        </View>
+    <FlatList
+    horizontal
+    showsHorizontalScrollIndicator={false}>
+      <View>
+
       </View>
-    </ScrollView>
+      <TouchableOpacity
+        style={{
+        marginRight: 5,
+        backgroundColor: '#fff',
+        elevation: 3,
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        marginBottom: 10,
+        borderRadius: 15,
+        marginLeft: 5,
+        }}>
+      </TouchableOpacity>
+
+    </FlatList>
   );
 };
 
-const itemVertical = StyleSheet.create({
-  listCard: {
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    gap: 15,
-  },
-  cardItem: {
-    backgroundColor: colors.blue(0.03),
-    flexDirection: 'row',
-    borderRadius: 10,
-  },
-  cardCategory: {
-    color: colors.blue(),
-    fontSize: 10,
-    fontFamily: fontType['Pjs-SemiBold'],
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontFamily: fontType['Pjs-Bold'],
-    color: colors.black(),
-  },
-  cardText: {
-    fontSize: 10,
-    fontFamily: fontType['Pjs-Medium'],
-    color: colors.blue(0.6),
-  },
-  cardImage: {
-    width: 94,
-    height: 94,
-    borderRadius: 10,
-    resizeMode: 'cover',
-  },
-  cardInfo: {
-    flexDirection: 'row',
-    gap: 5,
-    alignItems: 'center',
-  },
-  cardContent: {
-    gap: 10,
-    justifyContent: 'space-between',
-    paddingRight: 10,
-    paddingLeft: 15,
-    flex: 1,
-    paddingVertical: 10,
-  },
-});
-const itemHorizontal = StyleSheet.create({
+const itemMenu = StyleSheet.create({
   cardItem: {
     width: 280,
   },
   cardImage: {
     width: '100%',
-    height: 200,
-    borderRadius: 5,
+    height: 240,
   },
   cardContent: {
     flexDirection: 'row',
@@ -171,38 +170,41 @@ const itemHorizontal = StyleSheet.create({
     borderRadius: 5,
   },
 });
-
-const ItemCategory = ({item, onPress, color}) => {
-  return (
-    <TouchableOpacity onPress={onPress}>
-      <View style={category.item}>
-        <Text style={{...category.title, color}}>{item.categoryName}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
-const FlatListCategory = () => {
-  const [selected, setSelected] = useState(1);
-  const renderItem = ({item}) => {
-    const color = item.id === selected ? colors.blue() : colors.grey();
-    return (
-      <ItemCategory
-        item={item}
-        onPress={() => setSelected(item.id)}
-        color={color}
-      />
-    );
-  };
-  return (
-    <FlatList
-      data={CategoryList}
-      keyExtractor={item => item.id}
-      renderItem={item => renderItem({...item})}
-      ItemSeparatorComponent={() => <View style={{width: 10}} />}
-      contentContainerStyle={{paddingHorizontal: 24}}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-    />
-  );
-};
+const itemHorizontal = StyleSheet.create({
+  cardItem: {
+    width: 280,
+  },
+  cardImage: {
+    width: 200,
+    height: 180,
+    resizeMode: 'cover',
+  },
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+  },
+  cardInfo: {
+    justifyContent: 'flex-end',
+    height: '100%',
+    gap: 10,
+    maxWidth: '60%',
+  },
+  cardTitle: {
+    fontFamily: fontType['Pjs-Bold'],
+    fontSize: 14,
+    color: colors.white(),
+  },
+  cardText: {
+    fontSize: 10,
+    color: colors.white(),
+    fontFamily: fontType['Pjs-Medium'],
+  },
+  cardIcon: {
+    backgroundColor: colors.white(0.33),
+    padding: 5,
+    borderColor: colors.white(),
+    borderWidth: 0.5,
+    borderRadius: 5,
+  },
+});

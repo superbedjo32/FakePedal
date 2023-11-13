@@ -11,6 +11,7 @@ import PO from '../img/mooer_PO.jpg';
 import R7 from '../img/mooer_R7.jpg';
 import radar from '../img/Mooer_Radar.jpg'; 
 import tri from '../img/mooer_tri.jpg';
+import rai from '../img/rai.jpg';
 
 export {
     p2,
@@ -26,4 +27,5 @@ export {
     R7,
     radar,
     tri,
+    rai,
 };

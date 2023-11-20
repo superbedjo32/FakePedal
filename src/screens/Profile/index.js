@@ -19,7 +19,7 @@ const Profile = () => {
         <View style={{gap: 15, alignItems: 'center', paddingTop:10}}>
           <View style={styles.circle}>
            <Image
-             source={ProfileData.profilePict}
+             source={rai}
              style={styles.image}
            />
            </View>

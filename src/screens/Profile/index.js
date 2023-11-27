@@ -4,8 +4,6 @@ import { fontType, colors } from '../../theme';
 import {Notification} from 'iconsax-react-native';
 import {ProfileData} from '../../../data';
 import { rai } from '../../assets/img';
-
-
 const Profile = () => {
   const data = ProfileData.slice;
   return (
@@ -19,7 +17,8 @@ const Profile = () => {
         <View style={{gap: 15, alignItems: 'center', paddingTop:10}}>
           <View style={styles.circle}>
            <Image
-             source={rai}
+             //source={ProfileData.profilePict}
+              source={rai}
              style={styles.image}
            />
            </View>
@@ -49,9 +48,7 @@ const Profile = () => {
     </View>
   );
 };
-
 export default Profile;
-
 const styles = StyleSheet.create({
     container: {
       //flex: 1,
@@ -104,7 +101,6 @@ const styles = StyleSheet.create({
         borderRadius: 75,
       },
   });
-
   const kotak = StyleSheet.create({
     container: {
       paddingTop:15,

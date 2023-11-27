@@ -4,7 +4,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {  Home2, Avalanche, Profile2User, ShoppingCart } from 'iconsax-react-native';
 
 import React from 'react'
-import { Home,Profile,Keranjang } from '../screens';
+//import { Home,Profile,Keranjang } from '../screens';
+import { Home,Profile,Keranjang,ItemDetail } from '../screens';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const MainApp = () => {
@@ -50,6 +51,7 @@ const Router = () => {
   return (
     <Stack.Navigator initialRouteName="Splash">
       <Stack.Screen name="MainApp" component={MainApp} options={{ headerShown: false }} />
+      <Stack.Screen name="ItemDetail" component={ItemDetail} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }

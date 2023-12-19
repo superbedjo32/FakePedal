@@ -1,0 +1,29 @@
+{
+    "project_info": {
+      "project_number": "774832615796",
+      "project_id": "fakepedal-ab223",
+      "storage_bucket": "fakepedal-ab223.appspot.com"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:774832615796:android:433473399aafbc05a6fc21",
+          "android_client_info": {
+            "package_name": "com.tes"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyAKWOW_E0HmNgkmI13UGM-Dwx1A5WDJ_jE"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }

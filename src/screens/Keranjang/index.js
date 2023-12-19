@@ -1,11 +1,12 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity,ActivityIndicator, View, Animated } from 'react-native';
-import React, { useState,useRef,useCallback } from 'react';
-import ExercisesItem from '../../../components/ExercisesItem';
-import { useNavigation,useFocusEffect } from "@react-navigation/native";
-import { fontType } from '../../theme';
-import { Category } from 'iconsax-react-native';
-import axios from 'axios';
-const Exercises = () => {
+import {ScrollView, StyleSheet, Text, View,ActivityIndicator, TouchableOpacity, Image,Animated,RefreshControl} from 'react-native';
+import { fontType, colors } from '../../theme';
+import {SearchNormal1,Category, MoneyAdd} from 'iconsax-react-native';
+import { mt2w, re2, p2,  } from '../../assets/img';
+import {useNavigation,useFocusEffect} from '@react-navigation/native';
+import React, {useRef,useState,useCallback,useEffect} from 'react';
+import firestore from '@react-native-firebase/firestore';
+import Item from '../../components/Item';
+const Keranjang = () => {
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
   const diffClampY = Animated.diffClamp(scrollY, 0, 142);
@@ -15,92 +16,138 @@ const Exercises = () => {
       extrapolate: 'clamp',
     });
     const [loading, setLoading] = useState(true);
-    const [exercisesData, setExercisesData] = useState([]);
+    const [itemData, setItemData] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
-    const getDataExercises = async () => {
-      try {
-        const response = await axios.get(
-          'https://656c291ce1e03bfd572e06b1.mockapi.io/exercises',
-        );
-        setExercisesData(response.data);
-        setLoading(false)
-      } catch (error) {
-          console.error(error);
-      }
-    };
+    useEffect(() => {
+      const subscriber = firestore()
+        .collection('item')
+        .onSnapshot(querySnapshot => {
+          const item = [];
+          querySnapshot.forEach(documentSnapshot => {
+            item.push({
+              ...documentSnapshot.data(),
+              id: documentSnapshot.id,
+            });
+          });
+          setItemData(item);
+          setLoading(false);
+        });
+      return () => subscriber();
+    }, []);
     const onRefresh = useCallback(() => {
       setRefreshing(true);
       setTimeout(() => {
-        getDataExercises()
+        firestore()
+          .collection('item')
+          .onSnapshot(querySnapshot => {
+            const item = [];
+            querySnapshot.forEach(documentSnapshot => {
+              item.push({
+                ...documentSnapshot.data(),
+                id: documentSnapshot.id,
+              });
+            });
+            setItemData(itemData);
+          });
         setRefreshing(false);
       }, 1500);
     }, []);
-  
-    useFocusEffect(
-      useCallback(() => {
-        getDataExercises();
-      }, [])
-    );
-  return (
-    <View>
-<Animated.ScrollView
-        showsVerticalScrollIndicator={false}
+    return(
+      <View>
+        <Animated.ScrollView
+      showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{nativeEvent: {contentOffset: {y: scrollY}}}],
           {useNativeDriver: true},
         )}
-        contentContainerStyle={{paddingTop: 1}}>
-      <TouchableOpacity onPress={() => navigation.navigate("Search")}>
-        <Animated.View style={{padding: 20,marginVertical: 10,borderRadius: 14,backgroundColor: 'white',marginHorizontal: 8,transform: [{translateY: recentY}]}}>
-            <Text>Cari...</Text>
-        </Animated.View>
-      </TouchableOpacity>
-      
-      <View style={{flexDirection: 'row', padding: 10, justifyContent: 'center', gap: 10, marginTop: -6}}>
-        <TouchableOpacity>
-          <View style={{padding: 12, backgroundColor: 'white',borderRadius: 20}}>
-            <Text style={{fontFamily: fontType['PRM-Medium'], fontSize: 16, marginHorizontal: 6}}>Tipe</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <View style={{padding: 12, backgroundColor: 'white',borderRadius: 20}}>
-            <Text style={{fontFamily: fontType['PRM-Medium'], fontSize: 16, marginHorizontal: 6}}>Peralatan</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <View style={{padding: 12, backgroundColor: 'white',borderRadius: 20}}>
-            <Text style={{fontFamily: fontType['PRM-Medium'], fontSize: 16, marginHorizontal: 6}}>Otot</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.container}>    
-            <View style={styles.content}>
-              {loading ? (
+        contentContainerStyle={{paddingTop: -1}}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+      <View style={styles.container}>
+            <Animated.View style={[styles.header,{transform:[{translateY:recentY}]}]}>
+              <TouchableOpacity style={styles.bar} onPress={() => navigation.navigate("Search")}>
+                  <SearchNormal1 size={18} color={colors.grey(0.5)} variant="Linear" />
+                  <Text style={styles.placeholder}>Search</Text>
+              </TouchableOpacity>
+            </Animated.View>
+            <View style={{padding: 6,marginTop: 100,}}>
+              <Text style={recent.text}>Recent Search</Text>
+              <Text style={recent.text}>No History Found</Text>
+            </View>
+            {loading ? (
                 <ActivityIndicator size={'large'} color={'black'}/>
               ) : (
-                exercisesData.map((item, index) => <ExercisesItem item={item} key={index}/>)
+                itemData.map((item, index) => <Item item={item} key={index}/>)
               )}
-            </View>
           </View>
-    </Animated.ScrollView>
-    <TouchableOpacity style={{padding: 20, position:'absolute', top: 630,right: 20, backgroundColor:'white',borderRadius: 20}} onPress={() => navigation.navigate("AddExercises")}>
-        <Category size="18"  color="#2D2C2C" variant='Linear'/>
-    </TouchableOpacity>
-    </View>
-  )
-  }
-export default Exercises
+      </Animated.ScrollView>
+      <TouchableOpacity style={{padding: 20, position:'absolute', top: 630,right: 20, backgroundColor:'white',borderRadius: 20}} onPress={() => navigation.navigate("ItemSell")}>
+          <MoneyAdd size="30"  color="#2D2C2C" variant='Linear'/>
+      </TouchableOpacity>
+      </View>
+    );
+};
+
+export default Keranjang;
 const styles = StyleSheet.create({
-  container:{
-    flexDirection: 'column',
-    marginVertical: 10,
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
+  container: {
+    flex: 1,
+    backgroundColor: colors.white(),
   },
-  content: {
+header: {
+    paddingHorizontal: 24,
+    gap: 30,
     flexDirection: 'row',
-    flexWrap:'wrap',
-    justifyContent:'center'
+    alignItems: 'center',
+    height: 52,
+    elevation: 8,
+    paddingTop: 8,
+    paddingBottom: 4,
+    position: 'absolute',
+    backgroundColor: colors.white(),
+    zIndex: 999,
+    top: 42,
+    left: 0,
+    right: 0,
+    elevation: 1000,
   },
-})
+  bar: {
+    flexDirection: 'row',
+    padding: 10,
+    gap: 10,
+    alignItems: 'center',
+    backgroundColor: colors.grey(0.05),
+    borderRadius: 10,
+    flex: 1,
+  },
+  placeholder: {
+    fontSize: 14,
+    fontFamily: fontType['Pjs-Medium'],
+    color: colors.grey(0.5),
+    lineHeight: 18,
+  },
+});
+
+const recent = StyleSheet.create({
+    button: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 25,
+      borderColor: colors.grey(0.15),
+      borderWidth: 1,
+      backgroundColor: colors.grey(0.03),
+    },
+    label: {
+      fontSize: 12,
+      fontFamily: fontType['Pjs-Medium'],
+      color: colors.grey(0.65),
+    },
+    text: {
+      fontSize: 14,
+      fontFamily: fontType['Pjs-Bold'],
+      color: colors.black(),
+      paddingVertical: 5,
+      paddingHorizontal: 24,
+    },
+  });

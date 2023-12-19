@@ -7,81 +7,93 @@ import {useNavigation} from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import {formatNumber} from '../../utils/formatNumber';
 import {formatDate} from '../../utils/formatDate';
-import axios from 'axios';
+import firestore from '@react-native-firebase/firestore';
 const ItemDetail = ({route}) => {
-    const {productId} = route.params;
-    const [iconStates, setIconStates] = useState({
-        liked: {variant: 'Linear', color: 'gray'},
-        bookmarked: {variant: 'Linear', color: 'gray'},
-    });
-    const [selectedData, setSelectedData] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const {itemId} = route.params;
+  const [iconStates, setIconStates] = useState({
+    liked: {variant: 'Linear', color: 'gray'},
+    bookmarked: {variant: 'Linear', color: 'gray'},
+  });
+  const [selectedItem, setItemData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const actionSheetRef = useRef(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const openActionSheet = () => {
+    actionSheetRef.current?.show();
+  };
 
-    const actionSheetRef = useRef(null);
-    const [modalVisible, setModalVisible] = useState(false);
-    const openActionSheet = () => {
-        actionSheetRef.current?.show();
-    };
-
-    const closeActionSheet = () => {
-        actionSheetRef.current?.hide();
-    };
-
-    useEffect(() => {
-        getDataById();
-    }, [productId]);
-
-    const getDataById = async () => {
-        try {
-        const response = await axios.get(
-            `https://656d3039bcc5618d3c22e189.mockapi.io/product/${productId}`,
-        );
-        setSelectedData(response.data);
-        setLoading(false);
-        } catch (error) {
-        console.error(error);
+  const closeActionSheet = () => {
+    actionSheetRef.current?.hide();
+  };
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('item')
+      .doc(itemId)
+      .onSnapshot(documentSnapshot => {
+        const itemData = documentSnapshot.data();
+        if (itemData) {
+          console.log('Item data: ', itemData);
+          setItemData(itemData);
+        } else {
+          console.log(`Item with ID ${itemId} not found.`);
         }
-    };
+      });
+    setLoading(false);
+    return () => subscriber();
+  }, [itemId]);
 
-    const navigateEdit = () => {
-        closeActionSheet()
-        navigation.navigate('ItemEdit', {productId})
-    }
-    const handleDelete = async () => {
-    await axios.delete(`https://656d3039bcc5618d3c22e189.mockapi.io/product/${productId}`)
+  const navigateEdit = () => {
+    closeActionSheet()
+    navigation.navigate('ItemEdit', {itemId})
+  }
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await firestore()
+        .collection('item')
+        .doc(itemId)
+        .delete()
         .then(() => {
-            closeActionSheet()
-            navigation.navigate('Keranjang');
-        })
-        .catch((error) => {
-            console.error(error);
+          console.log('Item deleted!');
         });
+      if (selectedItem?.image) {
+        const imageRef = storage().refFromURL(selectedItem?.image);
+        await imageRef.delete();
+      }
+      console.log('Item deleted!');
+      closeActionSheet();
+      setItemData(null);
+      setLoading(false)
+      navigation.navigate('Keranjang');
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const navigation = useNavigation();
-    const scrollY = useRef(new Animated.Value(0)).current;
-    const diffClampY = Animated.diffClamp(scrollY, 0, 52);
-    const headerY = diffClampY.interpolate({
-        inputRange: [0, 52],
-        outputRange: [0, -52],
-    });
-    const bottomBarY = diffClampY.interpolate({
-        inputRange: [0, 52],
-        outputRange: [0, 52],
-    });
+  const navigation = useNavigation();
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const diffClampY = Animated.diffClamp(scrollY, 0, 52);
+  const headerY = diffClampY.interpolate({
+    inputRange: [0, 52],
+    outputRange: [0, -52],
+  });
+  const bottomBarY = diffClampY.interpolate({
+    inputRange: [0, 52],
+    outputRange: [0, 52],
+  });
 
-    const toggleIcon = iconName => {
-        setIconStates(prevStates => ({
-        ...prevStates,
-        [iconName]: {
-            variant: prevStates[iconName].variant === 'Linear' ? 'Bold' : 'Linear',
-            color:
-            prevStates[iconName].variant === 'Linear'
-                ? 'blue'
-                : 'gray',
-        },
-        }));
-    };
+  const toggleIcon = iconName => {
+    setIconStates(prevStates => ({
+      ...prevStates,
+      [iconName]: {
+        variant: prevStates[iconName].variant === 'Linear' ? 'Bold' : 'Linear',
+        color:
+          prevStates[iconName].variant === 'Linear'
+            ? 'blue'
+            : 'gray',
+      },
+    }));
+  };
     return (
         <View style={{flex: 1}}>
         <Animated.View
@@ -109,18 +121,18 @@ const ItemDetail = ({route}) => {
         <FastImage
             style={{width: 200,height:200, marginTop: 40}}
             source={{
-              uri: selectedData?.image,
+              uri: selectedItem?.image,
               headers: {Authorization: 'someAuthToken'},
               priority: FastImage.priority.high,
             }}
             resizeMode={FastImage.resizeMode.cover}></FastImage>
         </View>
         <View style={{flexDirection: 'row',gap:190, padding: 20}}>
-            <Text style={{fontFamily: fontType['Pjs-ExtraBold'],fontSize: 18}}>{selectedData?.title}</Text>
-            <Text style={{fontFamily: fontType['Pjs-ExtraBold'],fontSize: 18}}>{selectedData?.price}</Text>
+            <Text style={{fontFamily: fontType['Pjs-ExtraBold'],fontSize: 18}}>{selectedItem?.title}</Text>
+            <Text style={{fontFamily: fontType['Pjs-ExtraBold'],fontSize: 18}}>{selectedItem?.price}</Text>
         </View>
         <View style={{padding: 20}}>
-            <Text style={{fontFamily: fontType['Pjs-Light'],fontSize: 18}}>{selectedData?.description}</Text>
+            <Text style={{fontFamily: fontType['Pjs-Light'],fontSize: 18}}>{selectedItem?.description}</Text>
         </View>
         <View style={{padding: 20, alignItems: 'center', backgroundColor: '#7A9EFF', marginHorizontal: 16, borderRadius: 20}}>
             <Text  style={{fontFamily: fontType['Pjs-ExtraBold'],fontSize: 15,color: 'white'}}>Buy Now</Text>
@@ -138,13 +150,13 @@ const ItemDetail = ({route}) => {
           />
         </TouchableOpacity>
         <Text style={styles.info}>
-          {formatNumber(selectedData?.totalLikes)}
+          {formatNumber(selectedItem?.totalLikes)}
         </Text>
       </View>
       <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
         <Message color='gray' variant="Linear" size={24} />
         <Text style={styles.info}>
-          {formatNumber(selectedData?.totalComments)}
+          {formatNumber(selectedItem?.totalComments)}
         </Text>
       </View>
       <TouchableOpacity onPress={() => toggleIcon('bookmarked')}>
